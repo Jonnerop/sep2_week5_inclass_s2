@@ -25,6 +25,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withCredentials([string(credentialsId: "${SONAR_CREDENTIALS_ID}", variable: 'SONAR_TOKEN')])
+                {
                 withSonarQubeEnv('SonarQubeServer') {
                     bat """
                         sonar-scanner ^
@@ -35,6 +36,7 @@ pipeline {
                         -Dsonar.login=${SONAR_TOKEN} ^
                         -Dsonar.java.binaries=target/classes
                     """
+                }
                 }
             }
         }
