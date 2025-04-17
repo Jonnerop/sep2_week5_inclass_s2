@@ -6,6 +6,9 @@ pipeline {
         SONAR_CREDENTIALS_ID = 'sonarqube_token' // Store the token securely
         DOCKERHUB_CREDENTIALS_ID = '904663fb-32f1-455a-a8d3-20e1f645c356'
         DOCKERHUB_REPO = 'jonnerop/sonarqube'
+        SONAR_PROJECT_KEY = 'devops-demo'
+        SONAR_PROJECT_NAME = 'DevOps-Demo'
+        SONAR_HOST_URL = 'http://localhost:9000/'
         DOCKER_IMAGE_TAG = 'latest'
     }
 
@@ -23,23 +26,22 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                withCredentials([string(credentialsId: "${SONAR_CREDENTIALS_ID}", variable: 'SONAR_TOKEN')])
-                {
-                withSonarQubeEnv('SonarQubeServer') {
-                    bat """
-                        sonar-scanner ^
-                        -Dsonar.projectKey=devops-demo ^
-                        -Dsonar.sources=src ^
-                        -Dsonar.projectName=DevOps-Demo ^
-                        -Dsonar.host.url=http://localhost:9000 ^
-                        -Dsonar.login=${SONAR_TOKEN} ^
-                        -Dsonar.java.binaries=target/classes
-                    """
-                }
-                }
-            }
-        }
+                            steps {
+                                withCredentials([string(credentialsId: "${SONAR_CREDENTIALS_ID}", variable: 'SONAR_TOKEN')]) {
+                                    withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                                        bat """
+                                            sonar-scanner ^
+                                            -Dsonar.projectKey=${SONAR_PROJECT_KEY} ^
+                                            -Dsonar.sources=src ^
+                                            -Dsonar.projectName=${SONAR_PROJECT_NAME} ^
+                                            -Dsonar.host.url=${SONAR_HOST_URL} ^
+                                            -Dsonar.login=${SONAR_TOKEN} ^
+                                            -Dsonar.java.binaries=target/classes
+                                        """
+                                    }
+                                }
+                            }
+                        }
 
         stage('Build Docker Image') {
                     steps {
